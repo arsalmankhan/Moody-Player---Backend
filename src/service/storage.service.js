@@ -1,5 +1,5 @@
 const ImageKit = require("imagekit");
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const imagekit = new ImageKit({
     publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
@@ -9,18 +9,26 @@ const imagekit = new ImageKit({
 
 function uploadFile(file) {
     return new Promise((resolve, reject) => {
+
+        if (!file) {
+            return reject(new Error("No file provided"));
+        }
+
+        const base64File = file.buffer.toString("base64");
+
         imagekit.upload({
-            file: file.buffer,
-            fileName:new mongoose.Types.ObjectId().toString(),
-            folder:"Audio"
+            file: base64File,   
+            fileName: new mongoose.Types.ObjectId().toString(),
+            folder: "Audio"
         }, (error, result) => {
             if (error) {
-                reject(error)
+                console.error("ImageKit Error:", error);
+                reject(error);
             } else {
-                resolve(result)
+                resolve(result);
             }
-        })
-    })
+        });
+    });
 }
 
 module.exports = uploadFile;
